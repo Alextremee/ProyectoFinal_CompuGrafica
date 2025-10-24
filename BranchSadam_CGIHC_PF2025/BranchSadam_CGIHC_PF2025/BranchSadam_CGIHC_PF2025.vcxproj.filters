@@ -46,5 +46,17 @@
     <None Include="Shader\modelLoading.vs">
       <Filter>Source Files\Shader</Filter>
     </None>
+    <None Include="Shader\lamp.frag">
+      <Filter>Source Files\Shader</Filter>
+    </None>
+    <None Include="Shader\lamp.vs">
+      <Filter>Source Files\Shader</Filter>
+    </None>
+    <None Include="Shader\lighting.frag">
+      <Filter>Source Files\Shader</Filter>
+    </None>
+    <None Include="Shader\lighting.vs">
+      <Filter>Source Files\Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>
