@@ -97,6 +97,13 @@ void main( )
     color = vec4( result, texture(material.diffuse, TexCoords).rgb );
     if(color.a < 0.1 && transparency==1)
         discard;
+
+    /*vec4 texColor = texture(material.diffuse, TexCoords);
+    color = vec4(result * texColor.rgb, texColor.a);
+
+    if (color.a < 0.1 && transparency == 1)
+        discard;*/
+
 }
 
 vec3 CalcDirLight( DirLight light, vec3 normal, vec3 viewDir )

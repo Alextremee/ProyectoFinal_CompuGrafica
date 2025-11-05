@@ -261,16 +261,17 @@ int main()
 	GLuint cubemapTexture = loadCubemap(faces); // Se llama solo 1 vez
 
 	//Load Models
-    Model Dog((char*)"Models/RedDog.obj");
-	Model Piso((char*)"Models/piso.obj");
+   /* Model Dog((char*)"Models/RedDog.obj");
+	Model Piso((char*)"Models/piso.obj");*/
 	/*Model garage((char*)"Models/garage/parkhaus.obj");
 	Model dodge((char*)"Models/dodgeCharger/dodge2.obj");
 	Model hotwheel((char*)"Models/hotwheels/hotwheels.obj");
 	Model audir8((char*)"Models/Audi_R8_V10/audi.obj");
 	Model audi((char*)"Models/audir8/audi.obj");
 	Model tesla((char*)"Models/tesla/tesla.obj");
-	Model lamp((char*)"Models/lamp/lamp.obj");
-	Model lamp2((char*)"Models/lamp2/lamp2.obj");*/
+	Model lamp((char*)"Models/lamp/lamp.obj");*/
+	Model Techo((char*)"Models/museo/techo.obj");
+	Model Museo((char*)"Models/museo/museo.obj");
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -293,7 +294,7 @@ int main()
 	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
 
 	// Light attributes
-	glm::vec3 lightPos(1.0f, 2.0f, -5.0f);
+	glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))
@@ -320,7 +321,7 @@ int main()
 		GLint viewPosLoc = glGetUniformLocation(lightingShader.Program, "viewPos");
 		glUniform3f(viewPosLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
-		// Luz direccional tipo sol
+		 //Luz direccional tipo sol
 		glm::vec3 dirLightDirection(-0.2f, -1.0f, -0.3f); // dirección del sol
 		glm::vec3 dirLightAmbient(0.3f, 0.3f, 0.35f);    // color ambiental suave
 		glm::vec3 dirLightDiffuse(0.8f, 0.8f, 0.75f);    // color difuso del sol
@@ -349,7 +350,7 @@ int main()
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].position"), lightPos.x, lightPos.y, lightPos.z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient"), lightColor.x, lightColor.y, lightColor.z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].diffuse"), lightColor.x, lightColor.y, lightColor.z);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular"), 0.0f, 0.0f, 0.0f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular"), lightColor.x, lightColor.y, lightColor.z);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].constant"), 1.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.09f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.032f);
@@ -361,15 +362,40 @@ int main()
 		// Nota cómo el nombre del uniform ahora incluye el índice "[0]"
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[0].position"), lightPos1.x, lightPos1.y, lightPos1.z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[0].direction"), dir1.x, dir1.y, dir1.z);
+
 		// --- LUZ 1 (Morada Neón) ---
-		/*glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[0].diffuse"), 5.0f, 0.5f, 6.0f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[0].diffuse"), 5.0f, 0.5f, 6.0f);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[0].specular"), 5.0f, 0.5f, 6.0f);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[0].ambient"), 5.0f, 0.5f, 6.0f);*/
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[0].ambient"), 5.0f, 0.5f, 6.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].constant"), 1.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].linear"), 0.14f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].quadratic"), 0.07f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].cutOff"), glm::cos(glm::radians(30.0f)));
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].outerCutOff"), glm::cos(glm::radians(35.0f)));
+
+		//// --- LUZ SPOTLIGHT (tipo museo) ---
+		//glm::vec3 lightPos1 = glm::vec3(-28.0f, 8.0f, -1.0f);  // más arriba y enfrente del cuadro
+		//glm::vec3 target1 = glm::vec3(-30.0f, 4.0f, -1.0f);  // centrado en el cuadro
+		//glm::vec3 dir1 = glm::normalize(target1 - lightPos1);
+
+		//// Posición y dirección
+		//glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[0].position"), lightPos1.x, lightPos1.y, lightPos1.z);
+		//glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[0].direction"), dir1.x, dir1.y, dir1.z);
+
+		//// --- COLOR (cálido, tipo luz halógena de galería) ---
+		//glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[0].ambient"), 0.05f, 0.04f, 0.03f);  // muy tenue
+		//glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[0].diffuse"), 0.9f, 0.8f, 0.6f);    // cálido
+		//glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[0].specular"), 1.0f, 0.9f, 0.7f);   // reflejo brillante
+
+		//// --- ATENUACIÓN (para simular foco de galería) ---
+		//glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].constant"), 1.0f);
+		//glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].linear"), 0.09f);
+		//glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].quadratic"), 0.032f);
+
+		//// --- ÁNGULO DEL CONO ---
+		//glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].cutOff"), glm::cos(glm::radians(15.0f)));   // más enfocado
+		//glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].outerCutOff"), glm::cos(glm::radians(22.0f))); // borde suave
+
 
 		// --- LUZ 2 (Índice 1 - Simétrica) ---
 		glm::vec3 lightPos2 = glm::vec3(-1.0f, 0.0f, 2.5f);
@@ -378,9 +404,9 @@ int main()
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[1].position"), lightPos2.x, lightPos2.y, lightPos2.z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[1].direction"), dir2.x, dir2.y, dir2.z);
 		// --- LUZ 2 (Azul Neón) ---
-		/*glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[1].diffuse"), 0.0f, 3.0f, 6.0f);
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[1].diffuse"), 0.0f, 3.0f, 6.0f);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[1].specular"), 0.0f, 3.0f, 6.0f);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[1].ambient"), 0.0f, 3.0f, 6.0f);*/
+		glUniform3f(glGetUniformLocation(lightingShader.Program, "spotLights[1].ambient"), 0.0f, 3.0f, 6.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[1].constant"), 1.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[1].linear"), 0.14f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[1].quadratic"), 0.07f);
@@ -404,20 +430,25 @@ int main()
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-		glm::mat4 model(1);
-		////Carga de modelo 
-        view = camera.GetViewMatrix();	
-		model = glm::mat4(1);
+		/*
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		Piso.Draw(lightingShader);
+		Piso.Draw(lightingShader);*/
 
-		model = glm::mat4(1);
-		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
+		glm::mat4 model = glm::mat4(1.0f); // Matriz identidad
+		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		Museo.Draw(lightingShader);
+
+		model = glm::mat4(1.0f); // Matriz identidad
+		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad
+		glEnable(GL_BLEND); // Activar canal alfa
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
-	    Dog.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
+		Techo.Draw(lightingShader);
+		glDisable(GL_BLEND);
+
 
 		glDepthFunc(GL_LEQUAL);  // Cambiar la función de profundidad
 		skyboxShader.Use();
