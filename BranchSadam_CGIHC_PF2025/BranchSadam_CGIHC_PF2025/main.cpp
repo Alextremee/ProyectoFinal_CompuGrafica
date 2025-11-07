@@ -266,11 +266,12 @@ int main()
 	Model lamp((char*)"Models/lamp/lamp.obj");*/
 	Model Techo((char*)"Models/museo/techo.obj");
 	Model Museo((char*)"Models/museo/museo.obj");
-	/*Model EstatuaCentral((char*)"Models/estatuacentral/estatuacentral.obj");
-	Model salaRomana((char*)"Models/salaRomana/salaRomana.obj");*/
+	Model EstatuaCentral((char*)"Models/estatuacentral/estatuacentral.obj");
+	Model salaRomana((char*)"Models/salaRomana/salaRomana.obj");
 	Model esfera((char*)"Models/salaNeon/esfera.obj");
+	Model salaEgipcia((char*)"Models/salaEgipcia/salaEgipcia.obj");
 	Model salaNeon((char*)"Models/salaNeon/salaNeon.obj");
-	//Model salaEgipcia((char*)"Models/salaEgipcia/salaEgipcia.obj");
+	Model salaCyber((char*)"Models/salaCyber/salaCyber.obj");
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -488,29 +489,35 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		Museo.Draw(lightingShader);
 
-		//model = glm::mat4(1.0f); // Matriz identidad
-		//model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		//EstatuaCentral.Draw(lightingShader);
+		model = glm::mat4(1.0f); // Matriz identidad
+		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		EstatuaCentral.Draw(lightingShader);
 
-		//model = glm::mat4(1.0f); // Matriz identidad
-		//model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		//salaRomana.Draw(lightingShader);
+		model = glm::mat4(1.0f); // Matriz identidad
+		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		salaRomana.Draw(lightingShader);
 
-		//model = glm::mat4(1.0f); // Matriz identidad
-		//model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		//salaEgipcia.Draw(lightingShader);
+		model = glm::mat4(1.0f); // Matriz identidad
+		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		salaEgipcia.Draw(lightingShader);
 
 		model = glm::mat4(1.0f); // Matriz identidad
 		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		salaNeon.Draw(lightingShader);
+
+		model = glm::mat4(1.0f); // Matriz identidad
+		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		salaCyber.Draw(lightingShader);
 
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(16.9f, 3.0f, 15.6f)); 
