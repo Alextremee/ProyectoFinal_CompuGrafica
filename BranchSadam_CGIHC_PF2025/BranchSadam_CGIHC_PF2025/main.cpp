@@ -268,8 +268,9 @@ int main()
 	Model Museo((char*)"Models/museo/museo.obj");
 	/*Model EstatuaCentral((char*)"Models/estatuacentral/estatuacentral.obj");
 	Model salaRomana((char*)"Models/salaRomana/salaRomana.obj");*/
-	Model esfera1((char*)"Models/salaNeon/esfera1.obj");
+	Model esfera((char*)"Models/salaNeon/esfera.obj");
 	Model salaNeon((char*)"Models/salaNeon/salaNeon.obj");
+	//Model salaEgipcia((char*)"Models/salaEgipcia/salaEgipcia.obj");
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -292,7 +293,8 @@ int main()
 	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
 
 	// Light attributes
-	glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
+	//glm::vec3 lightPos(0.0f, 0.0f, 0.0f); 
+	glm::vec3 lightPos(16.9f, 3.0f, 15.6f);
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))
@@ -339,8 +341,8 @@ int main()
 
 		//Point light 1
 		glm::vec3 lightColor;
-		//glm::vec3 Light1 = glm::vec3(1.0f, 0.85f, 0.7f); // Luz cálida
-		glm::vec3 Light1 = glm::vec3(0.0f, 0.0f, 0.0f); // Luz cálida
+		glm::vec3 Light1 = glm::vec3(1.0f, 0.85f, 0.7f); // Luz cálida
+		//glm::vec3 Light1 = glm::vec3(0.0f, 0.0f, 0.0f); // Luz cálida
 		lightColor.x = abs(sin(glfwGetTime() * Light1.x));
 		lightColor.y = abs(sin(glfwGetTime() * Light1.y));
 		lightColor.z = sin(glfwGetTime() * Light1.z);
@@ -498,6 +500,12 @@ int main()
 		//glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		//salaRomana.Draw(lightingShader);
 
+		//model = glm::mat4(1.0f); // Matriz identidad
+		//model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		//salaEgipcia.Draw(lightingShader);
+
 		model = glm::mat4(1.0f); // Matriz identidad
 		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -510,7 +518,7 @@ int main()
 		model = glm::scale(model, glm::vec3(0.25f));  
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		esfera1.Draw(lightingShader);
+		esfera.Draw(lightingShader);
 
 		model = glm::mat4(1.0f); // Matriz identidad
 		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad
