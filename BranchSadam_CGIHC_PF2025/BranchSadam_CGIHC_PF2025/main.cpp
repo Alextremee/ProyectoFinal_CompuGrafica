@@ -3,6 +3,9 @@
 //Fecha de entrega: 
 //numeros de cuenta
 
+#include <sstream>
+#include <iomanip>
+
 
 #include <iostream>
 #include <cmath>
@@ -34,6 +37,7 @@
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
+void Animation(float t);
 
 // Window dimensions
 const GLuint WIDTH =1200, HEIGHT = 800;
@@ -141,6 +145,30 @@ bool firstMouse = true;
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
+
+
+// Variables de animación por keyframes
+int animFrame,animFrame2 = 0;              // Índice del frame actual de la animación
+float frameTimer = 0.0f;
+float frameDuration = 0.05f;    // Duración de cada frame (ajústala para cambiar la velocidad)
+
+// Parámetros de la animación de la pirámide en espiral
+float radioEspiral = 4.0f;        // radio de la trayectoria
+float velocidadAngular = 1.0f;    // velocidad de giro en la espiral
+float velocidadAscenso = 0.5f;    // velocidad de ascenso
+float velocidadRotacion = 60.0f;  // grados por segundo de rotación sobre su eje
+float x = 0.0f;
+float z = 0.0f;
+float rotacionPropia = 0;
+	// Control de estados
+	int estadoPiramide = 0;    // 0: reposo, 1: subiendo, 2: bajando
+	float tiempoInicioEstado = 0.0f;
+	float altura = 0.0f;
+	float alturaMaxima = 5.0f; // altura máxima que alcanzará
+
+
+
+
 
 GLuint loadCubemap(std::vector<std::string> faces)
 {
@@ -266,12 +294,29 @@ int main()
 	Model lamp((char*)"Models/lamp/lamp.obj");*/
 	Model Techo((char*)"Models/museo/techo.obj");
 	Model Museo((char*)"Models/museo/museo.obj");
+	/*
 	Model EstatuaCentral((char*)"Models/estatuacentral/estatuacentral.obj");
 	Model salaRomana((char*)"Models/salaRomana/salaRomana.obj");
+	Model salaCyber((char*)"Models/salaCyber/salaCyber.obj");
+	*/
+	Model salaNeon((char*)"Models/salaNeon/salaNeon.obj");
 	Model esfera((char*)"Models/salaNeon/esfera.obj");
 	Model salaEgipcia((char*)"Models/salaEgipcia/salaEgipcia.obj");
-	Model salaNeon((char*)"Models/salaNeon/salaNeon.obj");
-	Model salaCyber((char*)"Models/salaCyber/salaCyber.obj");
+	Model piramide((char*)"Models/salaEgipcia/piramide.obj");
+
+	std::vector<Model> robotFrames;
+	for (int i = 0; i < 80; i++) {
+		std::ostringstream ss;
+		ss << "Models/salaNeon/robot/frame_" << std::setw(3) << std::setfill('0') << i << ".obj";
+		robotFrames.push_back(Model((GLchar*)ss.str().c_str()));
+	}
+
+	/*std::vector<Model> alienFrames;
+	for (int i = 0; i < 10; i++) {
+		std::ostringstream ss;
+		ss << "Models/salaEgipcia/alien/frame_" << std::setw(3) << std::setfill('0') << i << ".obj";
+		alienFrames.push_back(Model((GLchar*)ss.str().c_str()));
+	}*/
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -296,6 +341,7 @@ int main()
 	// Light attributes
 	//glm::vec3 lightPos(0.0f, 0.0f, 0.0f); 
 	glm::vec3 lightPos(16.9f, 3.0f, 15.6f);
+	//glm::vec3 lightPos(-13.0f, 0.0f, -17.0f);
 
 	// Game loop
 	while (!glfwWindowShouldClose(window))
@@ -308,12 +354,16 @@ int main()
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
 		DoMovement();
+		//Animation();
 
 		// Clear the colorbuffer
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//-------------------------------------------------------------------------------------------------------------------
+								//************* DEFINICION DE FUENTES DE LUZ
+		
+
 
 		// Use cooresponding shader when setting uniforms/drawing objects
 		lightingShader.Use();
@@ -352,9 +402,13 @@ int main()
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient"), lightColor.x, lightColor.y, lightColor.z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].diffuse"), lightColor.x, lightColor.y, lightColor.z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular"), lightColor.x, lightColor.y, lightColor.z);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].constant"), 1.0f);
+		/*glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].constant"), 1.0f);
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.09f);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.032f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.032f);*/
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].constant"), 1.0f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.07f);
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.017f);
+
 
 		//--- LUZ 1---
 		/*glm::vec3 lightPos1 = glm::vec3(1.0f, 0.0f, 2.5f);
@@ -391,9 +445,9 @@ int main()
 		//glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[1].cutOff"), glm::cos(glm::radians(30.0f)));
 		//glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[1].outerCutOff"), glm::cos(glm::radians(35.0f)));
 
-		// --- LUZ SPOTLIGHT (MONALISA) ---
-		glm::vec3 lightPos1 = glm::vec3(-29.0f, 8.5f, -1.2f);  // más arriba 
-		glm::vec3 target1 = glm::vec3(-29.0f, 4.0f, -1.2f);  // centrado en el cuadro
+					//************* --- LUZ SPOTLIGHT (MONALISA) ---
+		glm::vec3 lightPos1 = glm::vec3(-29.0f, 7.9f, -1.2f);  // más arriba 
+		glm::vec3 target1 = glm::vec3(-28.0f, 4.0f, -1.2f);  // centrado en el cuadro
 		glm::vec3 dir1 = glm::normalize(target1 - lightPos1);
 
 		// Posición y dirección
@@ -411,12 +465,12 @@ int main()
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].quadratic"), 0.032f);
 
 		// --- ÁNGULO DEL CONO ---
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].cutOff"), glm::cos(glm::radians(19.0f)));   // más enfocado
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].outerCutOff"), glm::cos(glm::radians(22.0f))); // borde suave
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].cutOff"), glm::cos(glm::radians(20.0f)));   // 
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[0].outerCutOff"), glm::cos(glm::radians(25.0f))); // 
 
-		// --- LUZ SPOTLIGHT (DAVID) ---
-		glm::vec3 lightPos2 = glm::vec3(29.0f, 8.5f, -1.2f);   // simétrica respecto al eje X
-		glm::vec3 target2 = glm::vec3(29.0f, 4.0f, -1.2f);     // centrada igual que la otra
+					// ***************--- LUZ SPOTLIGHT (DAVID) ---
+		glm::vec3 lightPos2 = glm::vec3(29.0f, 7.9f, -1.2f);   // simétrica respecto al eje X
+		glm::vec3 target2 = glm::vec3(28.0f, 4.0f, -1.2f);     // centrada igual que la otra
 		glm::vec3 dir2 = glm::normalize(target2 - lightPos2);
 
 		// Posición y dirección
@@ -434,12 +488,13 @@ int main()
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[1].quadratic"), 0.032f);
 
 		// --- ÁNGULO DEL CONO ---
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[1].cutOff"), glm::cos(glm::radians(19.0f)));
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[1].outerCutOff"), glm::cos(glm::radians(22.0f)));
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[1].cutOff"), glm::cos(glm::radians(20.0f)));   // 
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[1].outerCutOff"), glm::cos(glm::radians(25.0f))); // 
 
-		// --- LUZ SPOTLIGHT Centro (mar de nubes) ---
-		glm::vec3 lightPos3 = glm::vec3(0.0f, 8.5f, -29.5f);   // frente al cuadro, centrada
-		glm::vec3 target3 = glm::vec3(0.0f, 4.0f, -29.5f);      // apunta al cuadro central
+					// ********** --- LUZ SPOTLIGHT Centro (mar de nubes) ---
+		//glm::vec3 lightPos3 = glm::vec3(0.0f, 8.5f, -29.5f);   // frente al cuadro, centrada
+		glm::vec3 lightPos3 = glm::vec3(0.0f, 7.9f, -29.5f);
+		glm::vec3 target3 = glm::vec3(0.0f, 4.0f, -28.5f);      // apunta al cuadro central
 		glm::vec3 dir3 = glm::normalize(target3 - lightPos3);
 
 		// Posición y dirección
@@ -457,12 +512,13 @@ int main()
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[2].quadratic"), 0.032f);
 
 		// --- ÁNGULO DEL CONO ---
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[2].cutOff"), glm::cos(glm::radians(19.0f)));
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[2].outerCutOff"), glm::cos(glm::radians(22.0f)));
-
+		/*glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[2].cutOff"), glm::cos(glm::radians(19.0f)));
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[2].outerCutOff"), glm::cos(glm::radians(22.0f)));*/
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[2].cutOff"), glm::cos(glm::radians(20.0f)));   // 
+		glUniform1f(glGetUniformLocation(lightingShader.Program, "spotLights[2].outerCutOff"), glm::cos(glm::radians(25.0f))); // 
 		
-
-
+		//********************************---------------------------------------------------------++++++++++++++++++++++++++++++++++++++++
+													//DIBUJO DE MODELOS
 		// Set material properties
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shininess"), 16.0f);
 
@@ -483,23 +539,45 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		Piso.Draw(lightingShader);*/
 
+		// Actualizar animación
+		// En tu loop principal, después de calcular deltaTime:
+		frameTimer += deltaTime;
+		if (frameTimer >= frameDuration) {
+			frameTimer = 0.0f;
+			animFrame = (animFrame + 1) % static_cast<int>(robotFrames.size());
+			//animFrame2 = (animFrame2 + 1) % static_cast<int>(alienFrames.size());
+		}
+
+		//// Ya con todos los modelos cargados:
+		//frameTimer += deltaTime;
+		//if (frameTimer >= frameDuration) {
+		//	frameTimer = 0.0f;
+
+		//	if (!robotFrames.empty())
+		//		animFrame = (animFrame + 1) % static_cast<int>(robotFrames.size());
+
+		//	if (!alienFrames.empty())
+		//		animFrame2 = (animFrame2 + 1) % static_cast<int>(alienFrames.size());
+		//}
+
+
 		glm::mat4 model = glm::mat4(1.0f); // Matriz identidad
 		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		Museo.Draw(lightingShader);
 
-		model = glm::mat4(1.0f); // Matriz identidad
-		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		EstatuaCentral.Draw(lightingShader);
+		//model = glm::mat4(1.0f); // Matriz identidad
+		//model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		//EstatuaCentral.Draw(lightingShader);
 
-		model = glm::mat4(1.0f); // Matriz identidad
-		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		salaRomana.Draw(lightingShader);
+		//model = glm::mat4(1.0f); // Matriz identidad
+		//model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		//salaRomana.Draw(lightingShader);
 
 		model = glm::mat4(1.0f); // Matriz identidad
 		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
@@ -513,11 +591,26 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		salaNeon.Draw(lightingShader);
 
+		// Dibujar el robot animado
 		model = glm::mat4(1.0f); // Matriz identidad
 		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		salaCyber.Draw(lightingShader);
+		robotFrames[animFrame].Draw(lightingShader);
+
+		//// Dibujar el robot animado
+		//model = glm::mat4(1.0f); // Matriz identidad
+		//model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		//alienFrames[animFrame].Draw(lightingShader);
+
+
+		//model = glm::mat4(1.0f); // Matriz identidad
+		//model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad		
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		//salaCyber.Draw(lightingShader);
 
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(16.9f, 3.0f, 15.6f)); 
@@ -526,6 +619,31 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		esfera.Draw(lightingShader);
+
+		// ---------------------- PIRÁMIDE EN ESPIRAL ----------------------
+		float t = glfwGetTime(); // tiempo global en segundos
+		Animation(t);
+
+		// Si han pasado 10 segundos y está en reposo, pasa al estado de ascenso
+		if (estadoPiramide == 0 && t - tiempoInicioEstado >= 10.0f) {
+			estadoPiramide = 1;
+			tiempoInicioEstado = t;
+		}
+
+		if (estadoPiramide == 1 || estadoPiramide == 2) {
+			rotacionPropia = velocidadRotacion * t;
+			x = radioEspiral * cos(velocidadAngular * t);
+			z = radioEspiral * sin(velocidadAngular * t);
+		}
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-13, 0, -17)); // posición base
+		model = glm::translate(model, glm::vec3(x, altura, z));
+		model = glm::rotate(model, glm::radians(rotacionPropia), glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.25f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
+		piramide.Draw(lightingShader);
 
 		model = glm::mat4(1.0f); // Matriz identidad
 		model = glm::scale(model, glm::vec3(0.25f, 0.25f, 0.25f)); // Escalar a la mitad
@@ -646,4 +764,57 @@ void MouseCallback(GLFWwindow* window, double xPos, double yPos)
 	camera.ProcessMouseMovement(xOffset, yOffset);
 }
 
+void Animation(float t) {
+	switch (estadoPiramide) {
+	case 0:
+		altura = 0.0f;
+		break;
+
+	case 1:
+		// SUBIENDO
+		altura += 0.5f * deltaTime;
+		if (altura >= alturaMaxima) {
+			altura = alturaMaxima;
+			estadoPiramide = 2;
+			tiempoInicioEstado = t;
+		}
+		break;
+
+	case 2:
+		// BAJANDO
+		altura -= 0.5f * deltaTime;
+		if (altura <= 0.0f) {
+			altura = 0.0f;
+			estadoPiramide = 3; 
+			tiempoInicioEstado = t;
+		}
+		break;
+
+	case 3:
+		// REGRESANDO AL ORIGEN (desde donde empezó su espiral)
+	{
+		// --- Regreso lineal al origen (sin espiral) ---
+		float velocidadRegreso = 2.0f; // controla la velocidad del regreso
+
+		// Movimiento lineal hacia el origen en X y Z
+		if (x > 0.0f) x -= velocidadRegreso * deltaTime;
+		else if (x < 0.0f) x += velocidadRegreso * deltaTime;
+
+		if (z > 0.0f) z -= velocidadRegreso * deltaTime;
+		else if (z < 0.0f) z += velocidadRegreso * deltaTime;
+
+		// Evita que oscile al pasar por cero
+		if (fabs(x) < 0.05f) x = 0.0f;
+		if (fabs(z) < 0.05f) z = 0.0f;
+
+		// Cuando llega al origen, vuelve al estado inicial
+		if (x == 0.0f && z == 0.0f) {
+			estadoPiramide = 0;
+			tiempoInicioEstado = t;
+		}
+	}
+	break;
+	}
+
+}
 
